@@ -1,0 +1,144 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Updated color scheme for space/asteroid theme with bright green accents */
+:root {
+  --background: rgb(15, 18, 31);
+  --foreground: rgb(250, 250, 250);
+  --card: rgb(20, 24, 38);
+  --card-foreground: rgb(250, 250, 250);
+  --popover: rgb(20, 24, 38);
+  --popover-foreground: rgb(250, 250, 250);
+  --primary: rgb(127, 255, 0);
+  --primary-foreground: rgb(15, 18, 31);
+  --secondary: rgb(30, 35, 51);
+  --secondary-foreground: rgb(250, 250, 250);
+  --muted: rgb(40, 45, 64);
+  --muted-foreground: rgb(140, 145, 165);
+  --accent: rgb(127, 255, 0);
+  --accent-foreground: rgb(15, 18, 31);
+  --destructive: rgb(220, 38, 38);
+  --destructive-foreground: rgb(250, 250, 250);
+  --border: rgb(50, 55, 77);
+  --input: rgb(50, 55, 77);
+  --ring: rgb(127, 255, 0);
+  --chart-1: rgb(255, 159, 64);
+  --chart-2: rgb(54, 162, 235);
+  --chart-3: rgb(75, 85, 99);
+  --chart-4: rgb(255, 205, 86);
+  --chart-5: rgb(255, 193, 7);
+  --radius: 0.625rem;
+  --sidebar: rgb(250, 250, 250);
+  --sidebar-foreground: rgb(23, 23, 23);
+  --sidebar-primary: rgb(38, 38, 38);
+  --sidebar-primary-foreground: rgb(250, 250, 250);
+  --sidebar-accent: rgb(245, 245, 245);
+  --sidebar-accent-foreground: rgb(38, 38, 38);
+  --sidebar-border: rgb(229, 229, 229);
+  --sidebar-ring: rgb(163, 163, 163);
+}
+
+.dark {
+  --background: rgb(23, 23, 23);
+  --foreground: rgb(250, 250, 250);
+  --card: rgb(23, 23, 23);
+  --card-foreground: rgb(250, 250, 250);
+  --popover: rgb(23, 23, 23);
+  --popover-foreground: rgb(250, 250, 250);
+  --primary: rgb(250, 250, 250);
+  --primary-foreground: rgb(38, 38, 38);
+  --secondary: rgb(51, 51, 51);
+  --secondary-foreground: rgb(250, 250, 250);
+  --muted: rgb(51, 51, 51);
+  --muted-foreground: rgb(163, 163, 163);
+  --accent: rgb(51, 51, 51);
+  --accent-foreground: rgb(250, 250, 250);
+  --destructive: rgb(127, 29, 29);
+  --destructive-foreground: rgb(250, 205, 199);
+  --border: rgb(51, 51, 51);
+  --input: rgb(51, 51, 51);
+  --ring: rgb(82, 82, 82);
+  --chart-1: rgb(96, 165, 250);
+  --chart-2: rgb(134, 239, 172);
+  --chart-3: rgb(255, 193, 7);
+  --chart-4: rgb(232, 121, 249);
+  --chart-5: rgb(248, 113, 113);
+  --sidebar: rgb(38, 38, 38);
+  --sidebar-foreground: rgb(250, 250, 250);
+  --sidebar-primary: rgb(96, 165, 250);
+  --sidebar-primary-foreground: rgb(250, 250, 250);
+  --sidebar-accent: rgb(51, 51, 51);
+  --sidebar-accent-foreground: rgb(250, 250, 250);
+  --sidebar-border: rgb(51, 51, 51);
+  --sidebar-ring: rgb(82, 82, 82);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Added starfield background animation */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s infinite;
+}
