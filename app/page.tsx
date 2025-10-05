@@ -2,6 +2,9 @@ import { HeroSection } from "@/components/hero-section"
 import { UsersSection } from "@/components/users-section"
 import { AstroIASection } from "@/components/astroia-section"
 import { Starfield } from "@/components/starfield"
+import { Footer } from "@/components/ui/footer"
+
+
 
 export default function Home() {
   return (
@@ -11,7 +14,9 @@ export default function Home() {
         <HeroSection />
         <UsersSection />
         <AstroIASection />
+        <Footer />
       </div>
     </main>
   )
 }
+

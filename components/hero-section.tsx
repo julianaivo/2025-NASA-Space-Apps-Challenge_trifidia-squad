@@ -1,17 +1,21 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
+
 export function HeroSection() {
   return (
     <section className="relative flex flex-col justify-center items-start w-full min-h-screen px-40">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-2">
-          <div className="flex flex-col gap-0.5">
-            <div className="h-0.5 w-8 bg-primary rounded"></div>
-            <div className="h-0.5 w-6 bg-primary rounded"></div>
-            <div className="h-0.5 w-4 bg-primary rounded"></div>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-primary">Astroview</h1>
+
+      <div className="flex items-center mb-4">
+        <div className="space-y-4" >
+          <Image
+            src="/astroview-logo.png"
+            alt="Astroview Logo"
+            width={300}
+            height={100}
+            className="object-contain"
+            priority
+          />
         </div>
       </div>
 
@@ -23,7 +27,7 @@ export function HeroSection() {
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
             It transforms NASA and USGS data into interactive simulations that help understand, communicate, and mitigate potential impacts on Earth.
           </p>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-12 py-6 text-lg font-semibold rounded-md">
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-12 py-6 text-lg font-semibold rounded-md hover:scale-[1.05] transition-all duration-300">
             Sign in
           </Button>
         </div>
