@@ -10,224 +10,253 @@ export function MapView() {
     lat: -10.9472,
     lng: -37.0731,
   })
+  const [mapError, setMapError] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window === "undefined" || !mapContainerRef.current) return
 
-    import("mapbox-gl").then((mapboxgl) => {
-      if (!mapContainerRef.current || mapRef.current) return
+    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+    if (!mapboxToken) {
+      setMapError("Token do Mapbox não configurado. Configure NEXT_PUBLIC_MAPBOX_TOKEN nas variáveis de ambiente.")
+      return
+    }
 
-      // Initialize Mapbox map
-      const map = new mapboxgl.Map({
-        container: mapContainerRef.current,
-        style: "mapbox://styles/mapbox/dark-v11",
-        center: [-37.0731, -10.9472], // Aracaju, Brazil
-        zoom: 11,
-        accessToken:
-          process.env.NEXT_PUBLIC_MAPBOX_TOKEN ||
-          "pk.eyJ1IjoidjBkZXYiLCJhIjoiY20yNXB5ZGZxMDFrYzJqcHptdGN5dGJhZCJ9.example",
+    import("mapbox-gl")
+      .then((module) => {
+        const mapboxgl = module.default
+        if (!mapContainerRef.current || mapRef.current) return
+
+        mapboxgl.accessToken = mapboxToken
+
+        // Initialize Mapbox map
+        const map = new mapboxgl.Map({
+          container: mapContainerRef.current,
+          style: "mapbox://styles/mapbox/dark-v11",
+          center: [-37.0731, -10.9472], // Aracaju, Brazil
+          zoom: 11,
+        })
+
+        mapRef.current = map
+
+        map.on("load", () => {
+          // Seismic Effect (outermost, blue)
+          map.addLayer({
+            id: "seismic-outer",
+            type: "circle",
+            source: {
+              type: "geojson",
+              data: {
+                type: "Feature",
+                geometry: {
+                  type: "Point",
+                  coordinates: [-37.0731, -10.9472],
+                },
+                properties: {},
+              },
+            },
+            paint: {
+              "circle-radius": {
+                stops: [
+                  [0, 0],
+                  [22, 800],
+                ],
+                base: 2,
+              },
+              "circle-color": "#3b82f6",
+              "circle-opacity": 0.05,
+              "circle-blur": 0.8,
+            },
+          })
+
+          // Radiation (yellow/orange)
+          map.addLayer({
+            id: "radiation",
+            type: "circle",
+            source: {
+              type: "geojson",
+              data: {
+                type: "Feature",
+                geometry: {
+                  type: "Point",
+                  coordinates: [-37.0731, -10.9472],
+                },
+                properties: {},
+              },
+            },
+            paint: {
+              "circle-radius": {
+                stops: [
+                  [0, 0],
+                  [22, 600],
+                ],
+                base: 2,
+              },
+              "circle-color": "#fbbf24",
+              "circle-opacity": 0.15,
+              "circle-blur": 0.7,
+            },
+          })
+
+          // Shock Wave (cyan/teal)
+          map.addLayer({
+            id: "shockwave",
+            type: "circle",
+            source: {
+              type: "geojson",
+              data: {
+                type: "Feature",
+                geometry: {
+                  type: "Point",
+                  coordinates: [-37.0731, -10.9472],
+                },
+                properties: {},
+              },
+            },
+            paint: {
+              "circle-radius": {
+                stops: [
+                  [0, 0],
+                  [22, 400],
+                ],
+                base: 2,
+              },
+              "circle-color": "#06b6d4",
+              "circle-opacity": 0.2,
+              "circle-blur": 0.6,
+            },
+          })
+
+          // Heat/Thermal (orange)
+          map.addLayer({
+            id: "heat",
+            type: "circle",
+            source: {
+              type: "geojson",
+              data: {
+                type: "Feature",
+                geometry: {
+                  type: "Point",
+                  coordinates: [-37.0731, -10.9472],
+                },
+                properties: {},
+              },
+            },
+            paint: {
+              "circle-radius": {
+                stops: [
+                  [0, 0],
+                  [22, 250],
+                ],
+                base: 2,
+              },
+              "circle-color": "#f97316",
+              "circle-opacity": 0.3,
+              "circle-blur": 0.5,
+            },
+          })
+
+          // Fireball (bright orange/red)
+          map.addLayer({
+            id: "fireball",
+            type: "circle",
+            source: {
+              type: "geojson",
+              data: {
+                type: "Feature",
+                geometry: {
+                  type: "Point",
+                  coordinates: [-37.0731, -10.9472],
+                },
+                properties: {},
+              },
+            },
+            paint: {
+              "circle-radius": {
+                stops: [
+                  [0, 0],
+                  [22, 120],
+                ],
+                base: 2,
+              },
+              "circle-color": "#ef4444",
+              "circle-opacity": 0.4,
+              "circle-blur": 0.4,
+            },
+          })
+
+          // Core/Epicenter (bright white/yellow)
+          map.addLayer({
+            id: "epicenter-glow",
+            type: "circle",
+            source: {
+              type: "geojson",
+              data: {
+                type: "Feature",
+                geometry: {
+                  type: "Point",
+                  coordinates: [-37.0731, -10.9472],
+                },
+                properties: {},
+              },
+            },
+            paint: {
+              "circle-radius": {
+                stops: [
+                  [0, 0],
+                  [22, 50],
+                ],
+                base: 2,
+              },
+              "circle-color": "#fef3c7",
+              "circle-opacity": 0.8,
+              "circle-blur": 0.3,
+            },
+          })
+
+          // Epicenter marker
+          const el = document.createElement("div")
+          el.className = "epicenter-marker"
+          el.style.width = "32px"
+          el.style.height = "32px"
+          el.style.background = "radial-gradient(circle, #ffffff 0%, #fbbf24 50%, transparent 100%)"
+          el.style.borderRadius = "50%"
+          el.style.border = "3px solid #ffffff"
+          el.style.boxShadow = "0 0 30px #fbbf24, 0 0 60px #f97316"
+
+          new mapboxgl.Marker({ element: el }).setLngLat([-37.0731, -10.9472]).addTo(map)
+        })
+
+        map.on("click", (e) => {
+          setClickedLocation({ lat: e.lngLat.lat, lng: e.lngLat.lng })
+        })
+      })
+      .catch((error) => {
+        console.error("[v0] Error loading Mapbox:", error)
+        setMapError("Erro ao carregar o Mapbox. Verifique a conexão com a internet.")
       })
 
-      mapRef.current = map
-
-      map.on("load", () => {
-        // Seismic Effect (outermost, blue)
-        map.addLayer({
-          id: "seismic-outer",
-          type: "circle",
-          source: {
-            type: "geojson",
-            data: {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [-37.0731, -10.9472],
-              },
-              properties: {},
-            },
-          },
-          paint: {
-            "circle-radius": {
-              stops: [
-                [0, 0],
-                [22, 800],
-              ],
-              base: 2,
-            },
-            "circle-color": "#3b82f6",
-            "circle-opacity": 0.05,
-            "circle-blur": 0.8,
-          },
-        })
-
-        // Radiation (yellow/orange)
-        map.addLayer({
-          id: "radiation",
-          type: "circle",
-          source: {
-            type: "geojson",
-            data: {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [-37.0731, -10.9472],
-              },
-              properties: {},
-            },
-          },
-          paint: {
-            "circle-radius": {
-              stops: [
-                [0, 0],
-                [22, 600],
-              ],
-              base: 2,
-            },
-            "circle-color": "#fbbf24",
-            "circle-opacity": 0.15,
-            "circle-blur": 0.7,
-          },
-        })
-
-        // Shock Wave (cyan/teal)
-        map.addLayer({
-          id: "shockwave",
-          type: "circle",
-          source: {
-            type: "geojson",
-            data: {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [-37.0731, -10.9472],
-              },
-              properties: {},
-            },
-          },
-          paint: {
-            "circle-radius": {
-              stops: [
-                [0, 0],
-                [22, 400],
-              ],
-              base: 2,
-            },
-            "circle-color": "#06b6d4",
-            "circle-opacity": 0.2,
-            "circle-blur": 0.6,
-          },
-        })
-
-        // Heat/Thermal (orange)
-        map.addLayer({
-          id: "heat",
-          type: "circle",
-          source: {
-            type: "geojson",
-            data: {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [-37.0731, -10.9472],
-              },
-              properties: {},
-            },
-          },
-          paint: {
-            "circle-radius": {
-              stops: [
-                [0, 0],
-                [22, 250],
-              ],
-              base: 2,
-            },
-            "circle-color": "#f97316",
-            "circle-opacity": 0.3,
-            "circle-blur": 0.5,
-          },
-        })
-
-        // Fireball (bright orange/red)
-        map.addLayer({
-          id: "fireball",
-          type: "circle",
-          source: {
-            type: "geojson",
-            data: {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [-37.0731, -10.9472],
-              },
-              properties: {},
-            },
-          },
-          paint: {
-            "circle-radius": {
-              stops: [
-                [0, 0],
-                [22, 120],
-              ],
-              base: 2,
-            },
-            "circle-color": "#ef4444",
-            "circle-opacity": 0.4,
-            "circle-blur": 0.4,
-          },
-        })
-
-        // Core/Epicenter (bright white/yellow)
-        map.addLayer({
-          id: "epicenter-glow",
-          type: "circle",
-          source: {
-            type: "geojson",
-            data: {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [-37.0731, -10.9472],
-              },
-              properties: {},
-            },
-          },
-          paint: {
-            "circle-radius": {
-              stops: [
-                [0, 0],
-                [22, 50],
-              ],
-              base: 2,
-            },
-            "circle-color": "#fef3c7",
-            "circle-opacity": 0.8,
-            "circle-blur": 0.3,
-          },
-        })
-
-        // Epicenter marker
-        const el = document.createElement("div")
-        el.className = "epicenter-marker"
-        el.style.width = "32px"
-        el.style.height = "32px"
-        el.style.background = "radial-gradient(circle, #ffffff 0%, #fbbf24 50%, transparent 100%)"
-        el.style.borderRadius = "50%"
-        el.style.border = "3px solid #ffffff"
-        el.style.boxShadow = "0 0 30px #fbbf24, 0 0 60px #f97316"
-
-        new mapboxgl.Marker({ element: el }).setLngLat([-37.0731, -10.9472]).addTo(map)
-      })
-
-      map.on("click", (e) => {
-        setClickedLocation({ lat: e.lngLat.lat, lng: e.lngLat.lng })
-      })
-
-      return () => {
-        map.remove()
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove()
         mapRef.current = null
       }
-    })
+    }
   }, [])
+
+  if (mapError) {
+    return (
+      <div className="relative w-full h-full flex items-center justify-center bg-muted/20">
+        <Card className="p-6 max-w-md">
+          <h3 className="text-lg font-semibold text-destructive mb-2">Erro de Configuração</h3>
+          <p className="text-sm text-muted-foreground mb-4">{mapError}</p>
+          <p className="text-xs text-muted-foreground">
+            Adicione a variável de ambiente nas Configurações do Projeto (ícone de engrenagem no canto superior
+            direito).
+          </p>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="relative w-full h-full">
