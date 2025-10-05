@@ -5,6 +5,7 @@ import Image from "next/image"
 export function HeroSection() {
   return (
     <section className="relative flex flex-col justify-center items-start w-full min-h-screen px-40">
+
       <div className="flex items-center mb-4">
         <div className="space-y-4" >
           <Image
@@ -26,7 +27,7 @@ export function HeroSection() {
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
             It transforms NASA and USGS data into interactive simulations that help understand, communicate, and mitigate potential impacts on Earth.
           </p>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-12 py-6 text-lg font-semibold rounded-md">
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-12 py-6 text-lg font-semibold rounded-md hover:scale-[1.05] transition-all duration-300">
             Sign in
           </Button>
         </div>
