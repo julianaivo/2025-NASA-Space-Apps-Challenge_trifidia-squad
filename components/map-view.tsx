@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from "react"
 import { Card } from "@/components/ui/card"
 
-export function MapView() {
+type MapViewProps = {
+  onLocationSelect?: (lat: number, lng: number) => void
+}
+
+export function MapView({ onLocationSelect }: MapViewProps = {}) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const [clickedLocation, setClickedLocation] = useState<{ lat: number; lng: number }>({
@@ -227,7 +231,9 @@ export function MapView() {
         })
 
         map.on("click", (e) => {
-          setClickedLocation({ lat: e.lngLat.lat, lng: e.lngLat.lng })
+          const location = { lat: e.lngLat.lat, lng: e.lngLat.lng }
+          setClickedLocation(location)
+          onLocationSelect?.(location.lat, location.lng)
         })
       })
       .catch((error) => {
@@ -241,7 +247,7 @@ export function MapView() {
         mapRef.current = null
       }
     }
-  }, [])
+  }, [onLocationSelect])
 
   if (mapError) {
     return (
