@@ -1,55 +1,124 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { MapView } from "@/components/map-view"
 import { ImpactTimeline } from "@/components/impact-timeline"
-import { Zap, Flame, Waves, Activity } from "lucide-react"
+import { useSimulationContext } from "@/contexts/SimulationContext"
+import { Zap, Flame, Waves, Activity, Play, Pause, RotateCcw } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 export function MapSimulator() {
-  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([
-    {
-      role: "assistant",
-      content:
-        "Olá! Clique no mapa para analisar diferentes localizações de impacto. Posso fornecer análises detalhadas sobre danos, população afetada e consequências.",
-    },
-  ])
-  const [input, setInput] = useState("")
+  const { simulationState, hasSimulationData } = useSimulationContext();
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationPhase, setAnimationPhase] = useState(0);
+  
+  // Extrair dados da simulação
+  const inputParams = simulationState.data?.details?.input_params;
+  const physicsOutput = simulationState.data?.details?.physics_output;
+  const kpis = simulationState.data?.kpis;
 
-  const handleSend = () => {
-    if (!input.trim()) return
+  // Controle de animação
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (isAnimating && hasSimulationData) {
+      interval = setInterval(() => {
+        setAnimationPhase((prev) => {
+          if (prev >= 100) {
+            setIsAnimating(false);
+            return 100;
+          }
+          return prev + 2; // Aumenta 2% a cada 100ms = 5 segundos total
+        });
+      }, 100);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isAnimating, hasSimulationData]);
 
-    setMessages([...messages, { role: "user", content: input }])
+  const startAnimation = () => {
+    if (!hasSimulationData) return;
+    setAnimationPhase(0);
+    setIsAnimating(true);
+  };
 
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "Analisando coordenadas... A região selecionada possui densidade populacional de 2.847 hab/km². O impacto nesta localização resultaria em danos catastróficos em um raio de 180 km.",
-        },
-      ])
-    }, 1000)
+  const pauseAnimation = () => {
+    setIsAnimating(false);
+  };
 
-    setInput("")
-  }
+  const resetAnimation = () => {
+    setIsAnimating(false);
+    setAnimationPhase(0);
+  };
+
+  // Formatar valores para exibição
+  const formatDistance = (km: number): string => {
+    if (km < 1) return `${(km * 1000).toFixed(0)}m`;
+    return `${km.toFixed(1)}km`;
+  };
 
   return (
     <div className="h-full flex flex-col bg-background">
       <div className="p-6 border-b border-border">
-        <h1 className="text-3xl font-mono font-bold text-primary tracking-wider">SIMULAÇÃO DE IMPACTO</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-mono font-bold text-primary tracking-wider">SIMULAÇÃO DE IMPACTO</h1>
+          
+          {hasSimulationData && (
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={isAnimating ? pauseAnimation : startAnimation}
+                className="gap-2"
+              >
+                {isAnimating ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                {isAnimating ? "Pausar" : "Simular"}
+              </Button>
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={resetAnimation}
+                className="gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Reset
+              </Button>
+            </div>
+          )}
+        </div>
+        {hasSimulationData && (
+          <div className="mt-2 text-sm text-muted-foreground">
+            {inputParams?.asteroid_type} • {formatDistance(inputParams?.diameter_km || 0)} • {inputParams?.velocity_km_s}km/s
+          </div>
+        )}
       </div>
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 flex flex-col">
           {/* Map Section */}
           <div className="flex-1 relative">
-            <MapView />
+            <MapView 
+              impactLocation={inputParams ? { 
+                lat: inputParams.impact_lat, 
+                lng: inputParams.impact_lng 
+              } : undefined}
+              damageData={physicsOutput ? {
+                crater: physicsOutput.raio_dano_explosao_km,
+                thermal: physicsOutput.raio_dano_termico_km,
+                shockwave: physicsOutput.raio_dano_explosao_km * 1.5,
+                seismic: physicsOutput.raio_dano_final_km,
+                final: physicsOutput.raio_dano_final_km
+              } : undefined}
+              animationPhase={animationPhase}
+              isAnimating={isAnimating}
+            />
           </div>
 
           <div className="border-t border-border">
-            <ImpactTimeline />
+            <ImpactTimeline animationPhase={animationPhase} />
           </div>
         </div>
 
@@ -57,24 +126,36 @@ export function MapSimulator() {
           {/* Parameters Panel */}
           <Card className="m-4 p-4 bg-card border-border">
             <h3 className="text-lg font-semibold text-foreground mb-4">Parâmetros</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Diâmetro:</span>
-                <span className="text-sm font-mono text-primary">10m</span>
+            {hasSimulationData && inputParams ? (
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Diâmetro:</span>
+                  <span className="text-sm font-mono text-primary">{formatDistance(inputParams.diameter_km)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Velocidade:</span>
+                  <span className="text-sm font-mono text-primary">{inputParams.velocity_km_s} km/s</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Ângulo:</span>
+                  <span className="text-sm font-mono text-primary">{inputParams.impact_angle}°</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Composição:</span>
+                  <span className="text-sm font-mono text-primary">{inputParams.asteroid_type}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Coordenadas:</span>
+                  <span className="text-xs font-mono text-primary">
+                    {inputParams.impact_lat.toFixed(3)}, {inputParams.impact_lng.toFixed(3)}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Velocidade:</span>
-                <span className="text-sm font-mono text-primary">11 km/s</span>
+            ) : (
+              <div className="text-sm text-muted-foreground text-center py-4">
+                Execute uma simulação na página de configuração para visualizar os parâmetros.
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Ângulo:</span>
-                <span className="text-sm font-mono text-primary">15°</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Composição:</span>
-                <span className="text-sm font-mono text-primary">Rochoso</span>
-              </div>
-            </div>
+            )}
           </Card>
 
           {/* Estimated Effects Panel */}
@@ -83,43 +164,54 @@ export function MapSimulator() {
               <Zap className="w-5 h-5 text-destructive" />
               <h3 className="text-lg font-semibold text-foreground">Efeitos Estimados</h3>
             </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-chart-1" />
-                  <span className="text-sm text-foreground">Cratera:</span>
+            {hasSimulationData && physicsOutput ? (
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <span className="text-sm text-foreground">Explosão:</span>
+                  </div>
+                  <span className="text-sm font-mono text-primary">{formatDistance(physicsOutput.raio_dano_explosao_km)}</span>
                 </div>
-                <span className="text-sm font-mono text-primary">8m</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <Flame className="w-3 h-3 text-chart-2" />
-                  <span className="text-sm text-foreground">Bola de Fogo:</span>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-3 h-3 text-orange-500" />
+                    <span className="text-sm text-foreground">Térmico:</span>
+                  </div>
+                  <span className="text-sm font-mono text-primary">{formatDistance(physicsOutput.raio_dano_termico_km)}</span>
                 </div>
-                <span className="text-sm font-mono text-primary">25m</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <Waves className="w-3 h-3 text-chart-3" />
-                  <span className="text-sm text-foreground">Onda de Choque:</span>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Waves className="w-3 h-3 text-cyan-500" />
+                    <span className="text-sm text-foreground">Onda de Choque:</span>
+                  </div>
+                  <span className="text-sm font-mono text-primary">{formatDistance(physicsOutput.raio_dano_explosao_km * 1.5)}</span>
                 </div>
-                <span className="text-sm font-mono text-primary">80m</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-chart-4" />
-                  <span className="text-sm text-foreground">Radiação Térmica:</span>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-3 h-3 text-blue-500" />
+                    <span className="text-sm text-foreground">Dano Final:</span>
+                  </div>
+                  <span className="text-sm font-mono text-primary">{formatDistance(physicsOutput.raio_dano_final_km)}</span>
                 </div>
-                <span className="text-sm font-mono text-primary">120m</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-3 h-3 text-chart-5" />
-                  <span className="text-sm text-foreground">Efeito Sísmico:</span>
+                <div className="pt-2 border-t border-border">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-foreground">Energia:</span>
+                    <span className="text-sm font-mono text-destructive">{physicsOutput.energia_megatons.toFixed(1)} MT</span>
+                  </div>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-sm text-foreground">Pop. em Risco:</span>
+                    <span className="text-sm font-mono text-destructive">
+                      {kpis?.population_in_risk.toLocaleString() || 'N/A'}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-sm font-mono text-primary">200m</span>
               </div>
-            </div>
+            ) : (
+              <div className="text-sm text-muted-foreground text-center py-4">
+                Execute uma simulação na página de configuração para visualizar os efeitos.
+              </div>
+            )}
           </Card>
 
           {/* Legend Panel */}
@@ -127,34 +219,56 @@ export function MapSimulator() {
             <h3 className="text-lg font-semibold text-foreground mb-4">Legenda</h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-4 h-4 rounded-full bg-chart-1 mt-0.5 flex-shrink-0" />
+                <div className="w-4 h-4 rounded-full bg-white mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="text-sm font-medium text-chart-1">Cratera / Bola de Fogo</div>
-                  <div className="text-xs text-muted-foreground">Destruição total</div>
+                  <div className="text-sm font-medium text-white">Epicentro</div>
+                  <div className="text-xs text-muted-foreground">Ponto de impacto</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-4 h-4 rounded-full bg-chart-3 mt-0.5 flex-shrink-0" />
+                <div className="w-4 h-4 rounded-full bg-red-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="text-sm font-medium text-chart-3">Onda de Choque</div>
-                  <div className="text-xs text-muted-foreground">Danos estruturais severos</div>
+                  <div className="text-sm font-medium text-red-400">Bola de Fogo</div>
+                  <div className="text-xs text-muted-foreground">Destruição total imediata</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-4 h-4 rounded-full bg-chart-4 mt-0.5 flex-shrink-0" />
+                <div className="w-4 h-4 rounded-full bg-orange-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="text-sm font-medium text-chart-4">Radiação Térmica</div>
+                  <div className="text-sm font-medium text-orange-400">Radiação Térmica</div>
                   <div className="text-xs text-muted-foreground">Queimaduras e incêndios</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-4 h-4 rounded-full bg-chart-5 mt-0.5 flex-shrink-0" />
+                <div className="w-4 h-4 rounded-full bg-cyan-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="text-sm font-medium text-chart-5">Efeito Sísmico</div>
+                  <div className="text-sm font-medium text-cyan-400">Onda de Choque</div>
+                  <div className="text-xs text-muted-foreground">Danos estruturais severos</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-4 h-4 rounded-full bg-blue-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-sm font-medium text-blue-400">Efeito Sísmico</div>
                   <div className="text-xs text-muted-foreground">Tremores e danos moderados</div>
                 </div>
               </div>
             </div>
+            
+            {isAnimating && (
+              <div className="mt-4 pt-4 border-t border-border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-foreground">Progresso:</span>
+                  <span className="text-sm font-mono text-primary">{animationPhase.toFixed(0)}%</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div 
+                    className="bg-primary h-2 rounded-full transition-all duration-100" 
+                    style={{ width: `${animationPhase}%` }}
+                  />
+                </div>
+              </div>
+            )}
           </Card>
         </div>
       </div>

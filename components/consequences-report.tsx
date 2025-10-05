@@ -1,31 +1,85 @@
 import { Card } from "@/components/ui/card"
 import { FileText } from "lucide-react"
+import { useSimulationContext } from "@/contexts/SimulationContext"
 
 export function ConsequencesReport() {
+  const { simulationState, hasSimulationData } = useSimulationContext();
+  
+  const llmReport = simulationState.data?.details?.llm_report;
+  const physicsOutput = simulationState.data?.details?.physics_output;
+  const kpis = simulationState.data?.kpis;
+
+  const formatReport = (report: string) => {
+    // Dividir o relatório em parágrafos baseados em pontos ou frases
+    const sentences = report.split(/[.!]\s+/).filter(sentence => sentence.trim().length > 0);
+    
+    return sentences.map((sentence, index) => {
+      const trimmedSentence = sentence.trim();
+      if (trimmedSentence) {
+        // Adicionar ponto final se não houver
+        const finalSentence = trimmedSentence.endsWith('.') || trimmedSentence.endsWith('!') 
+          ? trimmedSentence 
+          : trimmedSentence + '.';
+        
+        return (
+          <p key={index} className="mb-3">
+            {finalSentence}
+          </p>
+        );
+      }
+      return null;
+    });
+  };
+
+  const defaultReport = () => (
+    <div className="space-y-4 text-sm text-foreground leading-relaxed">
+      <p>
+        <strong className="text-accent">Status:</strong> Waiting for simulation data to generate impact report.
+      </p>
+      <p>
+        <strong className="text-accent">Instructions:</strong> Run a simulation on the configuration page to view detailed consequences report.
+      </p>
+    </div>
+  );
+
   return (
     <Card className="p-6 bg-card border-border">
       <div className="flex items-center gap-2 mb-4">
         <FileText className="w-4 h-4 text-primary" />
-        <h3 className="text-sm font-medium text-muted-foreground">Relatório de Consequências (IA)</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">Consequences Report (AI)</h3>
       </div>
-      <div className="space-y-4 text-sm text-foreground leading-relaxed">
-        <p>
-          <strong className="text-accent">Impacto Imediato:</strong> Cratera de aproximadamente 35 km de diâmetro.
-          Ejeção de material atingirá altitude de 80 km, causando escurecimento atmosférico regional por 6-8 semanas.
-        </p>
-        <p>
-          <strong className="text-accent">Zona Térmica:</strong> Raio de 120 km experimentará temperaturas superiores a
-          500°C. Ignição instantânea de materiais combustíveis. Taxa de sobrevivência estimada em 3%.
-        </p>
-        <p>
-          <strong className="text-accent">Onda de Choque:</strong> Pressão de sobrepressão de 20 psi até 180 km do
-          epicentro. Colapso estrutural de 95% das edificações. Ventos de 800 km/h na zona primária.
-        </p>
-        <p>
-          <strong className="text-accent">Efeitos Secundários:</strong> Terremotos de magnitude 7.8 em raio de 500 km.
-          Possível tsunami se impacto oceânico adjacente. Contaminação de aquíferos por 15-20 anos.
-        </p>
-      </div>
+      
+      {hasSimulationData && llmReport ? (
+        <div className="space-y-3 text-sm text-foreground leading-relaxed">
+          {formatReport(llmReport)}
+          
+          {physicsOutput && (
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-xs text-muted-foreground mb-2">Technical Data:</p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-muted-foreground">Energy:</span>
+                  <span className="ml-2 font-mono">{physicsOutput.energia_megatons.toFixed(2)} MT</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Explosion Alt.:</span>
+                  <span className="ml-2 font-mono">{physicsOutput.altitude_explosao_km.toFixed(2)} km</span>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {kpis && (
+            <div className="mt-2 pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground">
+                Assessment Source: <span className="font-mono">{kpis.risk_assessment_source}</span>
+              </p>
+            </div>
+          )}
+        </div>
+      ) : (
+        defaultReport()
+      )}
     </Card>
   )
 }

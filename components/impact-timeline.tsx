@@ -71,8 +71,25 @@ const timelineEvents: TimelineEvent[] = [
   },
 ]
 
-export function ImpactTimeline() {
+interface ImpactTimelineProps {
+  animationPhase?: number
+}
+
+export function ImpactTimeline({ animationPhase = 0 }: ImpactTimelineProps) {
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null)
+  
+  // Determinar qual evento está ativo baseado na fase da animação
+  const getActiveEventIndex = (phase: number): number => {
+    if (phase < 10) return -1; // Nenhum evento ainda
+    if (phase < 25) return 0;  // Entrada na atmosfera
+    if (phase < 50) return 1;  // Fragmentação
+    if (phase < 60) return 2;  // Impacto
+    if (phase < 80) return 3;  // Bola de fogo
+    if (phase < 95) return 4;  // Onda de choque
+    return 5; // Efeitos secundários
+  };
+  
+  const activeIndex = getActiveEventIndex(animationPhase);
 
   return (
     <>
@@ -83,25 +100,64 @@ export function ImpactTimeline() {
         </div>
 
         <div className="grid grid-cols-4 gap-3">
-          {timelineEvents.map((event, index) => (
-            <Card
-              key={index}
-              className="p-3 bg-secondary border-border hover:border-primary cursor-pointer transition-colors group"
-              onClick={() => setSelectedEvent(event)}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <Clock className="w-4 h-4 text-primary flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-mono text-primary mb-1">{event.time}</div>
-                    <div className="text-sm font-medium text-foreground truncate">{event.title}</div>
-                    <div className="text-xs text-muted-foreground line-clamp-1">{event.description}</div>
+          {timelineEvents.map((event, index) => {
+            const isActive = index === activeIndex;
+            const isCompleted = index < activeIndex;
+            const isPending = index > activeIndex;
+            
+            return (
+              <Card
+                key={index}
+                className={`p-3 cursor-pointer transition-all duration-300 group ${
+                  isActive 
+                    ? 'bg-primary/20 border-primary shadow-lg' 
+                    : isCompleted 
+                      ? 'bg-green-500/10 border-green-500/50' 
+                      : 'bg-secondary border-border hover:border-muted-foreground'
+                }`}
+                onClick={() => setSelectedEvent(event)}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
+                      isActive 
+                        ? 'bg-primary animate-pulse' 
+                        : isCompleted 
+                          ? 'bg-green-500' 
+                          : 'bg-muted'
+                    }`}>
+                      {isCompleted && (
+                        <div className="w-2 h-2 bg-white rounded-full" />
+                      )}
+                      {isActive && (
+                        <div className="w-2 h-2 bg-white rounded-full animate-ping" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-xs font-mono mb-1 ${
+                        isActive ? 'text-primary font-bold' : 
+                        isCompleted ? 'text-green-400' : 'text-muted-foreground'
+                      }`}>
+                        {event.time}
+                      </div>
+                      <div className={`text-sm font-medium truncate ${
+                        isActive ? 'text-foreground font-semibold' : 
+                        isCompleted ? 'text-foreground' : 'text-muted-foreground'
+                      }`}>
+                        {event.title}
+                      </div>
+                      <div className="text-xs text-muted-foreground line-clamp-1">
+                        {event.description}
+                      </div>
+                    </div>
                   </div>
+                  <ChevronRight className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                    isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'
+                  }`} />
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0" />
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       </div>
 

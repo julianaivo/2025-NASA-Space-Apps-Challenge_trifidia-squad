@@ -12,13 +12,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const navigation = [
     {
-      name: "Painel de Risco",
+      name: "Risk Dashboard",
       href: "/dashboard",
       icon: Activity,
       current: pathname === "/",
     },
     {
-      name: "Simulador de Impacto",
+      name: "Impact Simulator",
       href: "/simulador",
       icon: Map,
       current: pathname === "/simulador",
@@ -36,7 +36,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <h1 className="text-lg font-semibold text-foreground ">Asteroid Impact</h1>
-              <p className="text-xs text-muted-foreground">Sistema de Risco</p>
+              <p className="text-xs text-muted-foreground">Risk System</p>
             </div>
           </div>
         </div>
