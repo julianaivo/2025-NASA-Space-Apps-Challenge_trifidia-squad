@@ -3,24 +3,24 @@ import { Brain, Network, Target } from "lucide-react"
 const features = [
   {
     icon: Brain,
-    title: "Aprendizado contínuo",
-    description: "Modelos que evoluem com novos dados astronômicos",
+    title: "Continuous learning",
+    description: "Astro.IA learns from new observations and scientific updates, refining its predictions with each new piece of data.",
   },
   {
     icon: Network,
-    title: "Análise integrada",
-    description: "Combina múltiplas fontes de dados espaciais",
+    title: "Integrated analytics",
+    description: "It combines orbital, topographic, and atmospheric variables to predict not only the point of impact, but also secondary effects such as earthquakes and tsunamis.",
   },
   {
     icon: Target,
-    title: "Apoio à decisão",
-    description: "Insights precisos para ações preventivas",
+    title: "Decision support",
+    description: "It offers insights that help scientists, managers, and institutions act preventively, guiding risk mitigation and communication policies.",
   },
 ]
 
 export function AstroIASection() {
   return (
-    <section className="container mx-auto px-4 py-12 md:py-20">
+    <section className="relative flex flex-col justify-center items-start w-full min-h-screen px-70">
       <div className="text-center space-y-8">
         <div className="space-y-4">
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-primary">AstroIA</h2>
@@ -29,7 +29,7 @@ export function AstroIASection() {
 
         <div className="space-y-4 max-w-3xl mx-auto">
           <h3 className="text-3xl md:text-4xl font-bold leading-tight text-balance">
-            Modelo inteligente para prever impactos e compreender riscos em tempo real
+            Intelligent model to predict impacts and understand risks in real time
           </h3>
         </div>
 

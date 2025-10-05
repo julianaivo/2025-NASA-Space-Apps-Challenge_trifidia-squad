@@ -4,37 +4,36 @@ import Image from "next/image"
 const userTypes = [
   {
     icon: Telescope,
-    title: "Entusiasta",
-    description: "Explore o espaço",
+    title: "Enthusiast",
+    description: "For those curious and passionate about astronomy.",
   },
   {
     icon: Shield,
-    title: "Defesa Civil",
-    description: "Planeje respostas",
+    title: "Civil Defense",
+    description: "For public administrators.",
   },
   {
     icon: GraduationCap,
-    title: "Estudante",
-    description: "Aprenda sobre asteroides",
+    title: "Student",
+    description: "For those seeking a solid foundation.",
   },
   {
     icon: Microscope,
-    title: "Cientista",
-    description: "Analise dados reais",
+    title: "Researcher",
+    description: "For scientists and astronomical data professionals.",
   },
 ]
 
 export function UsersSection() {
   return (
-    <section className="container mx-auto px-4 py-12 md:py-20">
+    <section className="relative flex flex-col justify-center items-start w-full min-h-screen px-40">
       <div className="grid md:grid-cols-2 gap-8 items-center">
         <div className="space-y-6">
           <h2 className="text-4xl md:text-5xl font-bold leading-tight text-balance">
-            Da pesquisa científica à curiosidade individual.
-          </h2>
+            From scientific research to individual curiosity.
+            </h2>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-            O AstroView foi criado para diferentes objetivos que compartilham um mesmo objetivo: compreender os riscos
-            espaciais e agir de forma preventiva e educativa.
+            AstroView was created for different audiences who share the same goal: to understand space risks and act preventively and educationally.
           </p>
 
           <div className="grid grid-cols-2 gap-4 pt-4">
@@ -52,9 +51,20 @@ export function UsersSection() {
           </div>
         </div>
 
-        <div className="relative h-[400px] md:h-[500px]">
-          <Image src="/realistic-earth-from-space-showing-continents-and-.jpg" alt="Earth" fill className="object-contain" />
+
+        <div className="absolute right-[-360px] bottom-[-40px] mix-blend-screen brightness-125 opacity-95 pointer-events-none">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-[1000px] h-auto object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+          >
+            <source src="/TERRA.mov" type="video/quicktime" />
+            <source src="/TERRA.webm" type="video/webm" />
+          </video>
         </div>
+
       </div>
     </section>
   )
