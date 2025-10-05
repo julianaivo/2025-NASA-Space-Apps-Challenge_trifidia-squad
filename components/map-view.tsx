@@ -5,14 +5,30 @@ import { Card } from "@/components/ui/card"
 
 type MapViewProps = {
   onLocationSelect?: (lat: number, lng: number) => void
+  impactLocation?: { lat: number; lng: number }
+  damageData?: {
+    crater: number
+    thermal: number
+    shockwave: number
+    seismic: number
+    final: number
+  }
+  animationPhase?: number
+  isAnimating?: boolean
 }
 
-export function MapView({ onLocationSelect }: MapViewProps = {}) {
+export function MapView({ 
+  onLocationSelect, 
+  impactLocation, 
+  damageData, 
+  animationPhase = 0, 
+  isAnimating = false 
+}: MapViewProps = {}) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const [clickedLocation, setClickedLocation] = useState<{ lat: number; lng: number }>({
-    lat: -10.9472,
-    lng: -37.0731,
+    lat: impactLocation?.lat || -10.9472,
+    lng: impactLocation?.lng || -37.0731,
   })
   const [mapError, setMapError] = useState<string | null>(null)
 
@@ -248,6 +264,94 @@ export function MapView({ onLocationSelect }: MapViewProps = {}) {
       }
     }
   }, [onLocationSelect])
+
+  // Atualizar animação baseada nos dados reais
+  useEffect(() => {
+    if (!mapRef.current || !impactLocation || !damageData) return;
+
+    const map = mapRef.current;
+    const coordinates = [impactLocation.lng, impactLocation.lat];
+
+    // Calcular raios baseados na fase da animação
+    const currentPhase = animationPhase / 100;
+    
+    // Converter km para pixels de mapa baseado no zoom
+    const zoom = map.getZoom();
+    const kmToPixels = (km: number) => {
+      // Aproximação: 1 km ≈ (2^zoom) * 0.5 pixels no nível do mar
+      return km * Math.pow(2, zoom - 8) * 0.5;
+    };
+    
+    const layerUpdates = [
+      {
+        id: 'seismic-outer',
+        radius: kmToPixels(damageData.seismic * currentPhase),
+        color: '#3b82f6',
+        opacity: 0.05 * currentPhase
+      },
+      {
+        id: 'radiation',
+        radius: kmToPixels(damageData.thermal * currentPhase),
+        color: '#fbbf24',
+        opacity: 0.15 * currentPhase
+      },
+      {
+        id: 'shockwave',
+        radius: kmToPixels(damageData.shockwave * currentPhase),
+        color: '#06b6d4',
+        opacity: 0.2 * currentPhase
+      },
+      {
+        id: 'heat',
+        radius: kmToPixels(damageData.thermal * currentPhase * 0.8),
+        color: '#f97316',
+        opacity: 0.3 * currentPhase
+      },
+      {
+        id: 'fireball',
+        radius: kmToPixels(damageData.crater * currentPhase),
+        color: '#ef4444',
+        opacity: 0.4 * currentPhase
+      },
+      {
+        id: 'epicenter-glow',
+        radius: kmToPixels(0.5 * currentPhase),
+        color: '#ffffff',
+        opacity: 0.8 * currentPhase
+      }
+    ];
+
+    // Atualizar cada camada
+    layerUpdates.forEach(layer => {
+      if (map.getLayer(layer.id)) {
+        const source = map.getSource(layer.id);
+        if (source && source.setData) {
+          source.setData({
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: coordinates,
+            },
+            properties: {},
+          });
+        }
+
+        // Atualizar propriedades visuais
+        map.setPaintProperty(layer.id, 'circle-radius', Math.max(0, layer.radius));
+        map.setPaintProperty(layer.id, 'circle-color', layer.color);
+        map.setPaintProperty(layer.id, 'circle-opacity', layer.opacity);
+      }
+    });
+
+    // Centralizar no local de impacto na primeira execução
+    if (currentPhase === 0 && isAnimating) {
+      map.flyTo({
+        center: coordinates,
+        zoom: 11,
+        duration: 1500
+      });
+    }
+  }, [impactLocation, damageData, animationPhase, isAnimating]);
 
   if (mapError) {
     return (

@@ -18,13 +18,13 @@ export function HeroSection() {
       <div className="grid md:grid-cols-2 gap-8 items-center">
         <div className="space-y-6">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-balance">
-            Platform for visualization and simulation of steroid risks.
+            Platform for visualization and simulation of asteroid risks.
           </h2>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
             It transforms NASA and USGS data into interactive simulations that help understand, communicate, and mitigate potential impacts on Earth.
           </p>
           <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-12 py-6 text-lg font-semibold rounded-md">
-            Sign in
+            Get Started
           </Button>
         </div>
 
