@@ -37,7 +37,7 @@ export function MapView({
 
     const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
     if (!mapboxToken) {
-      setMapError("Token do Mapbox não configurado. Configure NEXT_PUBLIC_MAPBOX_TOKEN nas variáveis de ambiente.")
+      setMapError("Mapbox token not configured. Set NEXT_PUBLIC_MAPBOX_TOKEN in environment variables.")
       return
     }
 
@@ -254,7 +254,7 @@ export function MapView({
       })
       .catch((error) => {
         console.error("[v0] Error loading Mapbox:", error)
-        setMapError("Erro ao carregar o Mapbox. Verifique a conexão com a internet.")
+        setMapError("Error loading Mapbox. Please check your internet connection.")
       })
 
     return () => {
@@ -343,7 +343,7 @@ export function MapView({
       }
     });
 
-    // Centralizar no local de impacto na primeira execução
+    // Center on impact location on first run
     if (currentPhase === 0 && isAnimating) {
       map.flyTo({
         center: coordinates,
@@ -357,7 +357,7 @@ export function MapView({
     return (
       <div className="relative w-full h-full flex items-center justify-center bg-muted/20">
         <Card className="p-6 max-w-md">
-          <h3 className="text-lg font-semibold text-destructive mb-2">Erro de Configuração</h3>
+          <h3 className="text-lg font-semibold text-destructive mb-2">Configuration Error</h3>
           <p className="text-sm text-muted-foreground mb-4">{mapError}</p>
           <p className="text-xs text-muted-foreground">
             Adicione a variável de ambiente nas Configurações do Projeto (ícone de engrenagem no canto superior
@@ -382,7 +382,7 @@ export function MapView({
 
       {/* Instruction Tooltip */}
       <Card className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-card/95 backdrop-blur border-border">
-        <p className="text-xs text-muted-foreground">Clique no mapa para selecionar o local de impacto</p>
+        <p className="text-xs text-muted-foreground">Click on the map to select impact location</p>
       </Card>
 
       <style jsx global>{`

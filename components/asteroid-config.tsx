@@ -357,7 +357,7 @@ export function AsteroidConfig() {
         {/* Map Section */}
         <section className="mb-12">
           <h3 className="mb-2 text-3xl font-bold text-foreground">Map:</h3>
-          <p className="mb-6 text-muted-foreground">Defina a região do planeta que será realizada a simulação</p>
+          <p className="mb-6 text-muted-foreground">Define the region of the planet where the simulation will be carried out</p>
 
           <div className="mb-4 flex gap-2">
             <div className="relative flex-1 search-container">
@@ -404,7 +404,7 @@ export function AsteroidConfig() {
               )}
             </div>
             <Button onClick={handleSearch} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Buscar
+              Search
             </Button>
           </div>
 
@@ -417,7 +417,7 @@ export function AsteroidConfig() {
         {/* Parameters Section */}
         <section className="mb-12">
           <h3 className="mb-2 text-3xl font-bold text-foreground">Parameters:</h3>
-          <p className="mb-6 text-muted-foreground">Defina a região do planeta que será realizada a simulação</p>
+          <p className="mb-6 text-muted-foreground">Define the region of the planet where the simulation will be carried out</p>
 
           <div className="grid gap-6 md:grid-cols-3">
             {/* Projectile Parameters */}
@@ -599,7 +599,7 @@ export function AsteroidConfig() {
             {simulationState.loading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Simulando...
+                Simulating...
               </>
             ) : (
               "Simulate Impact"

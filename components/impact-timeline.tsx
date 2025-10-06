@@ -15,59 +15,59 @@ interface TimelineEvent {
 const timelineEvents: TimelineEvent[] = [
   {
     time: "T-10s",
-    title: "Entrada na Atmosfera",
-    description: "O asteroide entra na atmosfera terrestre",
+    title: "Atmospheric Entry",
+    description: "Asteroid enters Earth's atmosphere",
     details:
-      "O asteroide penetra a atmosfera terrestre a uma velocidade extrema, criando uma onda de choque supersônica e aquecimento intenso devido ao atrito com o ar.",
+      "The asteroid penetrates Earth's atmosphere at extreme velocity, creating a supersonic shockwave and intense heating due to air friction.",
   },
   {
     time: "T-5s",
-    title: "Fragmentação Atmosférica",
-    description: "Pressão atmosférica causa fragmentação",
+    title: "Atmospheric Fragmentation",
+    description: "Atmospheric pressure causes fragmentation",
     details:
-      "A pressão atmosférica e o aquecimento extremo causam a fragmentação do asteroide em múltiplos pedaços, aumentando a área de impacto potencial.",
+      "Atmospheric pressure and extreme heating cause the asteroid to fragment into multiple pieces, increasing the potential impact area.",
   },
   {
     time: "T-0s",
-    title: "Impacto",
-    description: "Colisão com a superfície terrestre",
+    title: "Impact",
+    description: "Collision with Earth's surface",
     details:
-      "O asteroide colide com a superfície terrestre, liberando uma quantidade massiva de energia equivalente a milhares de toneladas de TNT.",
+      "The asteroid collides with Earth's surface, releasing a massive amount of energy equivalent to thousands of tons of TNT.",
   },
   {
     time: "T+0.1s",
-    title: "Bola de Fogo",
-    description: "Formação da bola de fogo inicial",
+    title: "Fireball",
+    description: "Formation of initial fireball",
     details:
-      "Uma bola de fogo massiva se forma instantaneamente no ponto de impacto, vaporizando tudo em um raio de vários quilômetros.",
+      "A massive fireball forms instantly at the impact point, vaporizing everything within a radius of several kilometers.",
   },
   {
     time: "T+1s",
-    title: "Onda de Choque",
-    description: "Propagação da onda de choque supersônica",
+    title: "Shockwave",
+    description: "Supersonic shockwave propagation",
     details:
-      "Uma onda de choque supersônica se propaga do epicentro, causando destruição massiva de estruturas e danos severos em um raio extenso.",
+      "A supersonic shockwave propagates from the epicenter, causing massive destruction of structures and severe damage over an extensive radius.",
   },
   {
     time: "T+10s",
-    title: "Ejeção de Material",
-    description: "Material é ejetado da cratera",
+    title: "Material Ejection",
+    description: "Material is ejected from the crater",
     details:
-      "Grandes quantidades de material rochoso e detritos são ejetados da cratera formada, criando projéteis secundários que causam danos adicionais.",
+      "Large amounts of rocky material and debris are ejected from the formed crater, creating secondary projectiles that cause additional damage.",
   },
   {
     time: "T+1min",
-    title: "Radiação Térmica",
-    description: "Pulso de radiação térmica intensa",
+    title: "Thermal Radiation",
+    description: "Intense thermal radiation pulse",
     details:
-      "Um pulso intenso de radiação térmica se propaga, causando queimaduras severas e iniciando incêndios em massa em um raio de centenas de quilômetros.",
+      "An intense pulse of thermal radiation propagates, causing severe burns and initiating mass fires within a radius of hundreds of kilometers.",
   },
   {
     time: "T+10min",
-    title: "Efeitos Sísmicos",
-    description: "Ondas sísmicas se propagam pelo solo",
+    title: "Seismic Effects",
+    description: "Seismic waves propagate through the ground",
     details:
-      "O impacto gera ondas sísmicas equivalentes a um terremoto de grande magnitude, que podem ser detectadas em todo o planeta. Estruturas podem sofrer danos estruturais a centenas de quilômetros.",
+      "The impact generates seismic waves equivalent to a major earthquake, which can be detected across the entire planet. Structures may suffer structural damage hundreds of kilometers away.",
   },
 ]
 
@@ -78,15 +78,15 @@ interface ImpactTimelineProps {
 export function ImpactTimeline({ animationPhase = 0 }: ImpactTimelineProps) {
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null)
   
-  // Determinar qual evento está ativo baseado na fase da animação
+  // Determine which event is active based on animation phase
   const getActiveEventIndex = (phase: number): number => {
-    if (phase < 10) return -1; // Nenhum evento ainda
-    if (phase < 25) return 0;  // Entrada na atmosfera
-    if (phase < 50) return 1;  // Fragmentação
-    if (phase < 60) return 2;  // Impacto
-    if (phase < 80) return 3;  // Bola de fogo
-    if (phase < 95) return 4;  // Onda de choque
-    return 5; // Efeitos secundários
+    if (phase < 10) return -1; // No event yet
+    if (phase < 25) return 0;  // Atmospheric entry
+    if (phase < 50) return 1;  // Fragmentation
+    if (phase < 60) return 2;  // Impact
+    if (phase < 80) return 3;  // Fireball
+    if (phase < 95) return 4;  // Shockwave
+    return 5; // Secondary effects
   };
   
   const activeIndex = getActiveEventIndex(animationPhase);
@@ -96,7 +96,7 @@ export function ImpactTimeline({ animationPhase = 0 }: ImpactTimelineProps) {
       <div className="p-4 bg-card">
         <div className="flex items-center gap-2 mb-4">
           <Clock className="w-5 h-5 text-primary" />
-          <h3 className="text-lg font-semibold text-foreground">Linha do Tempo do Impacto</h3>
+          <h3 className="text-lg font-semibold text-foreground">Impact Timeline</h3>
         </div>
 
         <div className="grid grid-cols-4 gap-3">

@@ -34,7 +34,7 @@ export function KpiCard({ title, value, subtitle, icon: Icon, trend }: KpiCardPr
             <TrendingDown className="w-4 h-4 text-chart-4" />
           )}
           <span className={cn("text-sm font-medium", trend.direction === "up" ? "text-destructive" : "text-chart-4")}>
-            {trend.value}% vs. estimativa anterior
+            {trend.value}% vs. previous estimate
           </span>
         </div>
       )}
