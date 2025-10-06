@@ -28,7 +28,7 @@ export function HeroSection() {
             It transforms NASA and USGS data into interactive simulations that help understand, communicate, and mitigate potential impacts on Earth.
           </p>
           <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-12 py-6 text-lg font-semibold rounded-md hover:scale-[1.05] transition-all duration-300">
-            Sign in
+            Start
           </Button>
         </div>
 
