@@ -1,6 +1,17 @@
 import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import localFont from 'next/font/local'
+
+// Local fonts (from public/fonts)
+const Coolvetica = localFont({
+  src: [
+    { path: '../public/fonts/Coolvetica/Coolvetica-Hv-Comp.otf', weight: '400', style: 'normal' },
+    { path: '../public/fonts/Coolvetica/Coolvetica-Rg.otf', weight: '700', style: 'bold' },
+  ],
+  variable: '--font-coolvetica',
+  display: 'swap',
+})
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
@@ -17,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+  <body className={`font-sans ${Coolvetica.variable} ${GeistSans.variable} ${GeistMono.variable}`}>
         {children}
         <Analytics />
       </body>

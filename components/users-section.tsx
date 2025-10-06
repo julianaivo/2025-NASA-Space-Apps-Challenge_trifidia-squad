@@ -59,7 +59,7 @@ export function UsersSection() {
             </div>
           ))}
 
-          <div className="absolute right-[-360px] bottom-[-40px] mix-blend-screen brightness-125 opacity-95 pointer-events-none">
+          <div className="absolute right-[-360px] bottom-[-140px] mix-blend-screen brightness-125 opacity-95 pointer-events-none">
           <video
             autoPlay
             muted

@@ -76,7 +76,10 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  /* Prefer Coolvetica for sans, fall back to Geist (bundled) */
+  --font-sans: var(--font-coolvetica, var(--font-geist-sans));
+  /* If you don't host Helvetica files locally, fall back to system Helvetica */
+  --font-helvetica: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: var(--font-geist-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -141,4 +144,18 @@
   background: white;
   border-radius: 50%;
   animation: twinkle 3s infinite;
+}
+
+/* Typography rules: use Coolvetica for large/bold text (headings, strong) */
+h1, h2, h3, h4, h5, h6,
+.display, .hero-title,
+strong, b,
+.text-4xl, .text-5xl, .text-6xl {
+  /* next/font local exposes --font-coolvetica as a CSS variable on <body> */
+  font-family: var(--font-coolvetica, var(--font-helvetica));
+}
+
+/* Paragraphs and small text use Helvetica (system fallback) */
+p, li, small, .text-base, .text-sm {
+  font-family: var(--font-helvetica, var(--font-geist-sans));
 }
